@@ -1,0 +1,50 @@
+#! /bin/bash
+# auto deploy for opform
+# Author: Yuxuan
+
+DOC_PATH=/home/wendui/wdop/apps/opform
+WAR_NAME=opform.war
+TMP_BACKUP=/tmp/o
+
+if [ $# = 0 ] || [ ! -f $1 ]; then
+        echo 'You must input the war file as parameter'
+        exit
+fi
+
+if [[ $1 != *$WAR_NAME* ]];then
+        echo "The war file to be deployed [$1] is incorrect file, check it, do not be stupid"
+        exit
+fi
+
+source ifmodifiedtoday
+
+echo 'Test the war file' 
+jar tvf $1
+
+#echo 'Backup old war file'
+#if [ -e $DOC_PATH ]; then
+#	cd $DOC_PATH
+#	zip -rq $TMP_BACKUP *
+#	cp $TMP_BACKUP.zip /backup/war/$WAR_NAME.`date +%Y%m%d`
+#	rm $TMP_BACKUP.zip
+#	cd /tmp
+#fi
+
+echo 'Shutdown op tomcat'
+/sbin/service optomcat stop
+sleep 10
+
+echo 'Remove old war file'
+rm -rf $DOC_PATH
+
+echo 'Copy new war file'
+su - tomcat -c "unzip -q $1 -d $DOC_PATH"
+
+echo 'Startup op tomcat'
+/sbin/service optomcat start
+
+sleep 10
+
+echo 'Auto redeploy success'
+echo 'Backup the new war file'
+cp $1 /backup/war/$WAR_NAME.`date +%Y%m%d-%H%M%S`

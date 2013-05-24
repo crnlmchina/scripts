@@ -1,0 +1,10 @@
+#!/bin/bash
+#Author : yuxuan
+
+CONF='/usr/local/nginx/conf/nginx.conf'
+UPGRADE=/usr/local/nginx/conf/nginx.conf.upgrade
+NORMAL=/usr/local/nginx/conf/nginx.conf.normal
+
+rm $CONF
+ln -s $NORMAL $CONF
+/sbin/service nginxsrv reload 

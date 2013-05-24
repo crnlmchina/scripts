@@ -1,0 +1,36 @@
+# -*- coding: UTF-8 -*-
+import smtplib
+import sys
+from email.mime.text import MIMEText
+
+smtp_host = '219.136.240.92'
+smtp_port = 2525
+sender_acc = 'service@wendui.com'
+sender_pwd = ''
+
+test_emails = [
+	'crnlm@163.com'
+]
+
+def send_mail(to, subject, content):
+	msg = MIMEText(content)
+	msg['Subject'] = subject
+	msg['From'] = sender_acc
+
+	msg['To'] = to
+
+	s = smtplib.SMTP(smtp_host, smtp_port)
+	#s.login(smtp_host, sender_pwd)
+	s.sendmail(sender_acc, to, msg.as_string())
+	s.quit()
+
+
+if __name__ == '__main__':
+	subject = u'daily report'
+	content = u'sales: 10 billion'
+	for test_e in test_emails:
+		try:
+			send_mail(test_e, subject.encode('utf8'), content.encode('utf8'))
+		except:
+			print 'Send mail fail to : ' + test_e
+			print sys.exc_info()

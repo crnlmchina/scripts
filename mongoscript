@@ -1,0 +1,10 @@
+#! /bin/bash
+# mongo script on localhost/wendui
+# Author: Yuxuan
+
+if [ ! -f $1 ]; then
+	echo 'You must input a js file as parameter'
+	exit
+fi
+
+/home/mongo/bin/mongo localhost/wendui $1

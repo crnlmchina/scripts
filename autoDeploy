@@ -1,0 +1,75 @@
+#! /bin/bash
+# auto deploy
+# Author: Yuxuan
+
+DOC_PATH=/home/wendui/wdweb/apps/wendui
+WAR_NAME=wendui.war
+CHECK_URL='wget http://127.0.0.1:8080'
+CHECK_FILE='/tmp/index.html'
+TMP_BACKUP=/tmp/w
+
+if [ $# = 0 ] || [ ! -f $1 ]; then
+        echo 'You must input the war file as parameter'
+        exit
+fi
+
+if [[ $1 != *$WAR_NAME* ]];then
+        echo "The war file to be deployed [$1] is incorrect file, check it, do not be stupid"
+        exit
+fi
+
+source ifmodifiedtoday
+
+echo 'Test the war file'
+jar tvf $1
+
+echo 'Switch ngnix to upgrade'
+/home/wendui/scripts/switchNginxUpgrade
+
+#echo 'Backup old war file'
+#cd $DOC_PATH
+#zip -rq $TMP_BACKUP *
+#cp $TMP_BACKUP.zip /backup/war/$WAR_NAME.`date +%Y%m%d`
+#rm $TMP_BACKUP.zip
+#cd /tmp
+
+echo 'Shutdown tomcat'
+#/sbin/service tomcat stop
+/usr/local/bin/monit stop tomcat
+sleep 10
+
+echo 'Remove old war file'
+rm -rf $DOC_PATH
+
+echo 'Copy new war file'
+su - tomcat -c "unzip -q $1 -d $DOC_PATH"
+
+echo 'Startup tomcat'
+#/sbin/service tomcat start
+/usr/local/bin/monit start tomcat
+
+sleep 10
+
+echo 'check the deploy status'
+if [ -f $CHECK_FILE ]; then
+	rm $CHECK_FILE
+fi
+while [ true ]
+do
+	$CHECK_URL -P /tmp
+	if [ -e $CHECK_FILE ]; then
+		echo 'Ok, the login page can be access'
+		rm $CHECK_FILE 
+		break
+	else
+		echo 'Login page not worked, waiting 5 second'
+		sleep 5
+	fi
+done
+
+echo 'Switch nginx to normal'
+/home/wendui/scripts/switchNginxNormal
+
+echo 'Auto redeploy success'
+echo 'Backup the new war file'
+cp $1 /backup/war/$WAR_NAME.`date +%Y%m%d-%H%M%S`

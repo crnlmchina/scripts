@@ -1,0 +1,37 @@
+#! /bin/bash
+# redeploy wdcron
+# Author: yuxuan
+
+LIB_PATH=/home/wendui/lib
+CRON_PATH=/home/wendui/wdcron
+CRON_BAK_PATH=/tmp/wdcronbak
+
+if [ $# = 0 ] || [ ! -e $1 ]; then
+        echo 'You must specify the path of new libraries'
+        exit
+fi
+
+echo 'Do you realllllllllllllllllllllllllly ready to redeploy wdcron ? y/n'
+read -n 1 in
+if [ $in != 'y' ]; then
+        echo 'exit'
+        exit
+fi
+echo 'continue'
+
+echo 'backup the current library'
+if [ ! -e $CRON_BAK_PATH ]; then
+        mkdir $CRON_BAK_PATH
+fi
+
+cp $LIB_PATH/common-1.0.jar $LIB_PATH/mongo_dao-1.0.jar $LIB_PATH/pri_new_inte-1.0.jar $LIB_PATH/pri_new_impl-1.0.jar $LIB_PATH/search_pub_inte-1.0.jar $CRON_PATH/cron_job-1.0.jar $CRON_BAK_PATH
+mv $LIB_PATH/lang-*.jar $CRON_BAK_PATH
+
+echo 'deploy new library'
+cp /tmp/common-1.0.jar /tmp/mongo_dao-1.0.jar /tmp/pri_new_inte-1.0.jar /tmp/pri_new_impl-1.0.jar /tmp/search_pub_inte-1.0.jar /tmp/lang-*.jar $LIB_PATH
+cp /tmp/cron_job-1.0.jar $CRON_PATH
+
+echo 'restart wdcron'
+/usr/local/bin/monit stop wdcron
+sleep 10
+/usr/local/bin/monit start wdcron

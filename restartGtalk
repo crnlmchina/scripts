@@ -1,0 +1,19 @@
+#! /bin/bash
+
+GTALK_HOME='/home/wendui/scripts/python/gtalkrob'
+FIND_GTALK='ps -ef | grep gtalkrob | grep -v grep'
+ps -ef | grep gtalkrob | grep -v grep
+
+echo 'Killing gtalk processes...'
+pids=`ps -ef | grep gtalkrob | grep -v grep | awk '{print $2}'`
+echo $pids
+for pid in $pids;
+	do kill $pid
+done 
+
+sleep 3
+echo 'Start gtalk processes...'
+$GTALK_HOME/gtalk
+$GTALK_HOME/gtalk_chat
+
+ps -ef | grep gtalkrob | grep -v grep

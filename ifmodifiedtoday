@@ -1,0 +1,22 @@
+#! /bin/bash
+# Check if the file's modify time is today
+# Author: Yuxuan
+
+echo "Checking modify date of file: $1"
+
+file_modify_date=$(stat $1 | grep Modify | awk '{print $2}')
+echo "File modify date: $file_modify_date"
+
+curr_date=$(date +%Y-%m-%d)
+echo "Current date: $curr_date"
+
+if [ $file_modify_date == $curr_date ]; then
+	echo 'The file is ondate, let it go.'
+else
+	echo 'The file is outdate, please compare the file modify date & current date. If you still be sure to deploy it, type y'
+	read -n 1 in
+	if [ $in != 'y' ];then
+		echo 'exit'
+		exit
+	fi
+fi

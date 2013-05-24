@@ -1,0 +1,3 @@
+ROB_HOME=/home/wendui/scripts/python/gtalkrob
+LOG=$ROB_HOME/gtalk_chat.log
+python $ROB_HOME/gtalk_reciever.py >$LOG 2>&1 &
