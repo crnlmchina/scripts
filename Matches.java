@@ -19,8 +19,8 @@ public class Matches {
 		// 数据初始化
 		Map<String, List<String>> males = Maps.newLinkedHashMap();
 		males.put("Xavier", Lists.newArrayList("Amy", "Bertha", "Clare"));
-		males.put("Yancey", Lists.newArrayList("Bertha", "Amy", "Clare"));
 		males.put("Zeus", Lists.newArrayList("Amy", "Bertha", "Clare"));
+		males.put("Yancey", Lists.newArrayList("Bertha", "Amy", "Clare"));
 
 		Map<String, List<String>> females = Maps.newLinkedHashMap();
 		females.put("Amy", Lists.newArrayList("Yancey", "Xavier", "Zeus"));
@@ -39,6 +39,10 @@ public class Matches {
 		while (couples < 3) {
 			for (Entry<String, List<String>> entry : males.entrySet()) {
 				String male = entry.getKey();
+				// 如果已经找到girl了，让给他人吧
+				if (mm.containsKey(male)) {
+					continue;
+				}
 				// 依次循环我喜欢的girls
 				for (String female : entry.getValue()) {
 					// 如果这个girl以前没有和我dating过
